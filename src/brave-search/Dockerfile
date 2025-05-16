@@ -8,17 +8,9 @@ COPY tsconfig.json /tsconfig.json
 
 WORKDIR /app
 
-# Fix SSEServerTransport constructor directly with sed
-RUN grep -q "const transport = new SSEServerTransport({ port });" index.ts && \
-    sed -i 's/const transport = new SSEServerTransport({ port });/const transport = new SSEServerTransport({\n      server: {\n        port: port\n      }\n    });/g' index.ts || \
-    echo "Pattern not found, trying alternative pattern..."
+# Use a one-liner approach to fix SSEServerTransport
+RUN sed -i 's/const transport = new SSEServerTransport({ port })/const transport = new SSEServerTransport({ server: { port: port } })/g' index.ts || true
 
-# If the first pattern doesn't match, try with different spacing/formatting
-RUN grep -q "SSEServerTransport(" index.ts && \
-    sed -i '/SSEServerTransport(/,/);/ c\\
-    const transport = new SSEServerTransport({\n      server: {\n        port: port\n      }\n    });' index.ts || \
-    echo "No SSEServerTransport pattern found at all"
-    
 # Print the modified section for debugging
 RUN grep -A 10 "SSEServerTransport" index.ts || echo "No SSEServerTransport found in file"
 
