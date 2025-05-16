@@ -371,7 +371,11 @@ async function runServer() {
   const port = parseInt(process.env.PORT || '3000', 10);
   
   if (useSSE) {
-    const transport = new SSEServerTransport({ port });
+    const transport = new SSEServerTransport({
+      server: {
+        port: port
+      }
+    });
     await server.connect(transport);
     console.error(`Brave Search MCP Server running on SSE at port ${port}`);
   } else {
