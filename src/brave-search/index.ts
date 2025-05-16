@@ -2,6 +2,7 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -365,9 +366,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Brave Search MCP Server running on stdio");
+  // Use SSE or stdio transport depending on environment variable
+  const useSSE = process.env.TRANSPORT === 'sse';
+  const port = parseInt(process.env.PORT || '3000', 10);
+  
+  if (useSSE) {
+    const transport = new SSEServerTransport({ port });
+    await server.connect(transport);
+    console.error(`Brave Search MCP Server running on SSE at port ${port}`);
+  } else {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Brave Search MCP Server running on stdio");
+  }
 }
 
 runServer().catch((error) => {

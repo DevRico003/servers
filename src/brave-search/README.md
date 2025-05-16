@@ -161,6 +161,39 @@ Docker build:
 docker build -t mcp/brave-search:latest -f src/brave-search/Dockerfile .
 ```
 
+## Deploying with Coolify
+
+To deploy this server with Coolify and connect via SSE, follow these steps:
+
+1. In Coolify, create a new service using the Docker image or by connecting to your Git repository
+2. Configure the following environment variables:
+   - `BRAVE_API_KEY`: Your Brave Search API key
+   - `TRANSPORT`: Set to `sse` to use Server-Sent Events instead of stdio
+   - `PORT`: Set to `3000` (or your preferred port)
+3. Expose port 3000 in your Coolify configuration
+4. Add any necessary health checks or restart policies
+
+### Connecting with Claude Code
+
+Once deployed, you can connect to the MCP server using Claude Code with the SSE transport:
+
+```json
+{
+  "mcpServers": {
+    "brave-search": {
+      "transport": "sse",
+      "url": "https://your-coolify-domain.com:3000"
+    }
+  }
+}
+```
+
+Or with the Claude Code CLI:
+
+```bash
+claude mcp add --name brave-search --transport sse --url https://your-coolify-domain.com:3000
+```
+
 ## License
 
 This MCP server is licensed under the MIT License. This means you are free to use, modify, and distribute the software, subject to the terms and conditions of the MIT License. For more details, please see the LICENSE file in the project repository.
