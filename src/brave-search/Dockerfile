@@ -8,13 +8,18 @@ COPY tsconfig.json /tsconfig.json
 
 WORKDIR /app
 
-# Use a one-liner approach to fix SSEServerTransport
-RUN sed -i 's/const transport = new SSEServerTransport({ port })/const transport = new SSEServerTransport({ server: { port: port } })/g' index.ts || true
+# Create a simplified version of index.ts that fixes the SSEServerTransport issue
+RUN sed -i -E 's/const transport = new SSEServerTransport\(\{[^}]+\}\);/const transport = new SSEServerTransport({\n      server: {\n        port: port\n      }\n    });/g' index.ts || true
 
-# Print the modified section for debugging
-RUN grep -A 10 "SSEServerTransport" index.ts || echo "No SSEServerTransport found in file"
+# Skip the build step in the package.json prepare script
+RUN sed -i 's/"prepare": "npm run build"/"prepare": "echo Skipping prepare script"/g' package.json
 
-RUN --mount=type=cache,target=/root/.npm npm install
+# Install dependencies without running the build
+RUN --mount=type=cache,target=/root/.npm npm install --ignore-scripts
+
+# Manually compile TypeScript
+RUN npx tsc
+RUN chmod +x dist/*.js
 
 FROM node:22-alpine AS release
 
