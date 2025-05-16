@@ -3,8 +3,8 @@ version: '3'
 services:
   brave-search-mcp:
     build:
-      context: .
-      dockerfile: Dockerfile.simple
+      context: ../../..
+      dockerfile: src/brave-search/Dockerfile
     environment:
       - BRAVE_API_KEY=${BRAVE_API_KEY}
       - TRANSPORT=sse

@@ -163,36 +163,46 @@ docker build -t mcp/brave-search:latest -f src/brave-search/Dockerfile .
 
 ## Deploying with Coolify
 
-To deploy this server with Coolify and connect via SSE, follow these steps:
+To deploy this server with Coolify using SSE transport:
 
-1. In Coolify, create a new service using the Docker image or by connecting to your Git repository
-2. Configure the following environment variables:
-   - `BRAVE_API_KEY`: Your Brave Search API key
-   - `TRANSPORT`: Set to `sse` to use Server-Sent Events instead of stdio
-   - `PORT`: Set to `3000` (or your preferred port)
+### Option 1: Using Docker Compose
+
+1. In Coolify, create a new service:
+   - Select "Docker Compose" as the deployment method
+   - Use the provided docker-compose.yml file
+
+2. Configure Environment Variables:
+   - `BRAVE_API_KEY`: Your Brave Search API key (required)
+
+3. The docker-compose.yml already sets:
+   - `TRANSPORT=sse` (to use Server-Sent Events)
+   - `PORT=3000` (the port for the server)
+   - Port 3000 is exposed for external access
+
+### Option 2: Using Git Repository
+
+1. In Coolify, create a new service:
+   - Select "Docker" as the deployment method
+   - Select "Git Repository" as the source
+   - Set the build context to your repository root
+   - Set the Dockerfile path to `/servers/src/brave-search/Dockerfile`
+
+2. Configure Environment Variables:
+   - `BRAVE_API_KEY`: Your Brave Search API key (required)
+   - `TRANSPORT`: Set to `sse` to use Server-Sent Events
+   - `PORT`: Set to `3000` or your preferred port
+
 3. Expose port 3000 in your Coolify configuration
-4. Add any necessary health checks or restart policies
 
-### Connecting with Claude Code
+### Connecting to the MCP Server from Claude Code
 
-Once deployed, you can connect to the MCP server using Claude Code with the SSE transport:
-
-```json
-{
-  "mcpServers": {
-    "brave-search": {
-      "transport": "sse",
-      "url": "https://your-coolify-domain.com:3000"
-    }
-  }
-}
-```
-
-Or with the Claude Code CLI:
+Once deployed, connect to your MCP server using:
 
 ```bash
 claude mcp add --name brave-search --transport sse --url https://your-coolify-domain.com:3000
 ```
+
+Replace `your-coolify-domain.com` with your actual Coolify domain or IP address.
 
 ## License
 
