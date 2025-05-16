@@ -7,30 +7,42 @@ This guide will help you deploy the Brave Search MCP server on Coolify.
 1. A Coolify instance
 2. A Brave Search API key (get it from https://api-dashboard.search.brave.com/app/keys)
 
-## Deployment Steps
+## Deployment Options
 
-### 1. Create a new service in Coolify
+There are two methods for deployment:
 
-- Select "Docker" as the deployment method
-- Select "Git Repository" as the source
-- Provide your Git repository URL
-- Set the build context to your repository root
-- Set the Dockerfile path to `/servers/src/brave-search/Dockerfile`
+### Option 1: Using the Simple Dockerfile (Recommended)
 
-### 2. Configure Environment Variables
+1. In Coolify, create a new service:
+   - Select "Docker" as the deployment method
+   - Select "Docker Compose" or "Git Repository" as the source
+   - If using Git, provide your Git repository URL
+   - Set the build context to your repository root
+   - Set the Dockerfile path to `/servers/src/brave-search/Dockerfile.simple`
 
-Add the following environment variables:
+2. Configure Environment Variables:
+   - `BRAVE_API_KEY`: Your Brave Search API key
+   - `TRANSPORT`: Set to `sse` to use Server-Sent Events
+   - `PORT`: Set to `3000` (or your preferred port)
 
-- `BRAVE_API_KEY`: Your Brave Search API key
-- `TRANSPORT`: Set to `sse` to use Server-Sent Events
-- `PORT`: Set to `3000` (or your preferred port)
+3. Configure Network Settings:
+   - Expose port `3000` (or your configured port)
+   - If you're using a custom domain, set it up in Coolify
 
-### 3. Configure Network Settings
+### Option 2: Using Docker Compose
 
-- Expose port `3000` (or your configured port)
-- If you're using a custom domain, make sure to set it up in Coolify
+1. In Coolify, create a new service:
+   - Select "Docker Compose" as the deployment method
+   - Use the docker-compose.yml file provided
 
-### 4. Health Checks (Optional)
+2. Configure Environment Variables:
+   - `BRAVE_API_KEY`: Your Brave Search API key (the other variables are already set in docker-compose.yml)
+
+3. Configure Network Settings:
+   - The port is already configured in the docker-compose.yml file
+   - If you're using a custom domain, set it up in Coolify
+
+## Health Checks (Optional)
 
 Add a health check if desired:
 - Type: HTTP
@@ -39,11 +51,6 @@ Add a health check if desired:
 - Interval: 30s
 - Timeout: 5s
 - Retries: 3
-
-### 5. Deployment Options
-
-- Set "Always pull image" to true
-- Set appropriate resource limits based on your server capacity
 
 ## Connecting from Claude Code
 
